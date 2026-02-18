@@ -1,5 +1,5 @@
 all:
-	-@quarto render
+	@/home/mobihzova/opt/quarto/bin/quarto render
 
 clean:
 	-rm -rf _output
