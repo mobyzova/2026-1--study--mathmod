@@ -9,6 +9,8 @@
 ```{julia}
 using Plots
 using DifferentialEquations
+default(fmt = :png)
+gr(size=(800, 600), dpi=150)
 ```
 
 ## 2. Исходные данные
