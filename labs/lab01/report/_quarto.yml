@@ -8,7 +8,11 @@ self-contained: true
 ## Julia support
 engine: julia
 julia:
+<<<<<<< HEAD
   exeflags: ["--project=../project"]
+=======
+  exeflags: ["--project=/home/mobihzova/work/study/2026-1/2026-1--study--mathmod/labs/lab01/project"]
+>>>>>>> 7ae1baaab3b2f577bdd89dfe9e375faab525082d
 
 ## Generic options
 lang: ru-RU
@@ -34,7 +38,7 @@ format:
     toc-depth: 2
   ### Pdf output format
   pdf:
-    # pdf-engine: xelatex
+    pdf-engine: xelatex
     ### minted support
     # filters:
     #   - minted-quarto
