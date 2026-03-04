@@ -1,0 +1,53 @@
+using DifferentialEquations, Plots, DataFrames
+
+plot_dir = "plots/lab3"
+mkpath(plot_dir)
+
+x0 = 57570.0  # армия X
+y0 = 91210.0  # армия Y
+a, b, c, h = 0.223, 0.567, 0.7, 0.332
+tspan = (0.0, 1.0)
+
+P(t) = sin(5t) + 1
+Q(t) = cos(6t) + 1
+
+function system!(du, u, p, t)
+    x, y = u
+    du[1] = -a*x - b*y + P(t)
+    du[2] = -c*x - h*y + Q(t)
+end
+
+prob = ODEProblem(system!, [x0; y0], tspan)
+sol = solve(prob, Tsit5(), saveat=0.05)
+
+df = DataFrame(t=sol.t, x=[u[1] for u in sol.u], y=[u[2] for u in sol.u])
+println("\nМОДЕЛЬ №1 (регулярные войска)")
+println("Начальные условия: X0 = $x0, Y0 = $y0")
+println("\nПервые 5 строк:")
+println(first(df, 5))
+
+final_x, final_y = last(sol.u)[1], last(sol.u)[2]
+println("\nРезультаты при t = 1.0:")
+println("X = $(round(final_x, digits=2))")
+println("Y = $(round(final_y, digits=2))")
+println("Победитель: ", final_x > final_y ? "Армия X" : final_y > final_x ? "Армия Y" : "Ничья")
+
+plt1 = plot(sol,
+    label=["Армия X" "Армия Y"],
+    xlabel="Время", ylabel="Численность",
+    title="Модель №1: Регулярные войска",
+    linewidth=2, legend=:top)
+savefig(joinpath(plot_dir, "model1_regular_war.png"))
+
+plt2 = plot(sol.t, [u[1] for u in sol.u],
+    label="Армия X", xlabel="Время", ylabel="Численность",
+    title="Динамика армии X", linewidth=2, color=:blue)
+savefig(joinpath(plot_dir, "model1_army_X.png"))
+
+plt3 = plot(sol.t, [u[2] for u in sol.u],
+    label="Армия Y", xlabel="Время", ylabel="Численность",
+    title="Динамика армии Y", linewidth=2, color=:red)
+savefig(joinpath(plot_dir, "model1_army_Y.png"))
+
+println("\nГрафики сохранены в: $plot_dir")
+display(plt1)

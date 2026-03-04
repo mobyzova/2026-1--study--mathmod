@@ -1,0 +1,90 @@
+# Случай 1: Колебания без затухания и без внешней силы
+Уравнение: $\ddot{x} + 35x = 0$
+
+```{julia}
+using DrWatson
+@quickactivate "project"
+using DifferentialEquations
+using Plots
+```
+
+## Создание директории для сохранения графиков
+
+```{julia}
+plot_dir = plotsdir("lab4")
+mkpath(plot_dir)
+```
+
+## Параметры системы
+Собственная частота: $\omega_0 = \sqrt{35}$
+
+```{julia}
+const ω = √(35.0)
+const γ = 0.0
+```
+
+## Функция внешней силы
+В данном случае внешняя сила отсутствует: $f(t) = 0$
+
+```{julia}
+f(t) = 0.0
+```
+
+## Правая часть системы дифференциальных уравнений
+Система в форме Коши:
+\[
+\begin{cases}
+\dot{x} = y \\
+\dot{y} = -\omega_0^2 x - \gamma y + f(t)
+\end{cases}
+\]
+
+```{julia}
+function oscillator!(du, u, p, t)
+    du[1] = u[2]
+    du[2] = -ω^2 * u[1] - γ * u[2] + f(t)
+end
+```
+
+## Начальные условия
+$x_0 = 0$, $\dot{x}_0 = -0.6$
+
+```{julia}
+u0 = [0.0, -0.6]
+tspan = (0.0, 77.0)
+```
+
+## Решение системы ОДУ
+
+```{julia}
+prob = ODEProblem(oscillator!, u0, tspan)
+sol = solve(prob, Tsit5(), saveat = 0.05)
+```
+
+## Построение графиков
+### График решения $x(t)$
+
+```{julia}
+plot(sol, idxs = 1,
+     xlabel = "Время t",
+     ylabel = "Смещение x",
+     title = "Случай 1: x(t) без затухания (ω = √35)",
+     legend = false,
+     linewidth = 2)
+savefig(joinpath(plot_dir, "lab4_julia_1.png"))
+```
+
+### Фазовый портрет $(x, \dot{x})$
+
+```{julia}
+plot(sol, idxs = (1, 2),
+     xlabel = "x",
+     ylabel = "dx/dt",
+     title = "Фазовый портрет (случай 1)",
+     legend = false,
+     linewidth = 1)
+savefig(joinpath(plot_dir, "lab4_julia_1_ph.png"))
+
+println("Случай 1 выполнен. Графики сохранены в папку plots/lab4/")
+```
+

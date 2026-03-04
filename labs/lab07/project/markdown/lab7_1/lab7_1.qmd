@@ -1,0 +1,95 @@
+# Модель распространения рекламы. Случай 1
+
+**Вариант №60**
+
+Уравнение: $\frac{dn}{dt} = (0.93 + 0.00005 \cdot n(t))(N - n(t))$
+
+Параметры модели:
+* $N = 584$ - общий объём аудитории
+* $n_0 = 3$ - начальное число знающих о товаре
+
+```{julia}
+using DrWatson
+@quickactivate "project"
+
+using DifferentialEquations
+using Plots
+```
+
+## Определение параметров модели
+
+```{julia}
+const N = 584      # общий объём аудитории
+const n0 = 3.0      # начальное количество знающих
+const α₁ = 0.93     # коэффициент платной рекламы
+const α₂ = 0.00005  # коэффициент сарафанного радио
+```
+
+## Определение дифференциального уравнения
+
+Правая часть уравнения: $(0.93 + 0.00005 \cdot n)(N - n)$
+
+```{julia}
+function advertising!(du, u, p, t)
+    n = u[1]
+    du[1] = (α₁ + α₂ * n) * (N - n)
+end
+```
+
+## Решение ОДУ
+
+Задаём начальные условия и временной промежуток
+
+```{julia}
+u0 = [n0]
+tspan = (0.0, 10.0)
+
+prob = ODEProblem(advertising!, u0, tspan)
+sol = solve(prob, Tsit5(), saveat = 0.1)
+```
+
+## Извлечение результатов
+
+```{julia}
+n_values = [u[1] for u in sol.u]
+t_values = [t for t in sol.t]
+```
+
+## Построение графика
+
+```{julia}
+plt = plot(
+    dpi = 300,
+    title = "Модель распространения рекламы (случай 1)",
+    xlabel = "Время t",
+    ylabel = "Число знающих n(t)",
+    legend = false,
+    size = (800, 600)
+)
+plot!(plt, t_values, n_values, linewidth = 2, color = :blue)
+```
+
+Сохраняем график в папку plots/lab7
+
+```{julia}
+mkpath(plotsdir("lab7"))
+savefig(plt, plotsdir("lab7", "case1_α₁=0.93_α₂=0.00005.png"))
+```
+
+## Вывод результатов
+
+```{julia}
+println("\n" * "="^60)
+println("РЕЗУЛЬТАТЫ МОДЕЛИРОВАНИЯ (СЛУЧАЙ 1)")
+println("="^60)
+println("Параметры модели:")
+println("  N = $N")
+println("  n₀ = $n0")
+println("  α₁ = $α₁")
+println("  α₂ = $α₂")
+println("\nРезультаты:")
+println("  Конечное значение n(10.0) = $(round(n_values[end], digits=2))")
+println("  График сохранён: $(plotsdir("lab7", "case1_α₁=0.93_α₂=0.00005.png"))")
+println("="^60)
+```
+

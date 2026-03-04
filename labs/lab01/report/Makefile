@@ -1,5 +1,5 @@
 all:
-	-@quarto render
+	@set QUARTO_LOG_DIR=C:/quarto-logs && quarto render index.qmd --to pdf
 
 clean:
 	-rm -rf _output
