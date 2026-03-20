@@ -1,0 +1,121 @@
+# Модель "хищник-жертва" - Вариант 60
+## Стационарное состояние системы
+
+Стационарное состояние системы определяется из условия равенства
+производных нулю:
+
+$$ x_0 = \frac{c}{d}, \quad y_0 = \frac{a}{b} $$
+
+Для наших параметров:
+- $x_0 = 0.47 / 0.059 = 7.97$ (хищники)
+- $y_0 = 0.43 / 0.061 = 7.05$ (жертвы)
+
+```{julia}
+using DrWatson
+@quickactivate "project"
+using DifferentialEquations
+using Plots
+```
+
+Создаем директорию для сохранения графиков
+
+```{julia}
+plots_dir = "plots/lab5"
+mkpath(plots_dir)
+```
+
+Параметры модели
+
+```{julia}
+a = 0.43   # коэффициент смертности хищников
+b = 0.061  # коэффициент прироста хищников
+c = 0.47   # коэффициент прироста жертв
+d = 0.059  # коэффициент смертности жертв
+```
+
+Стационарное состояние
+
+```{julia}
+x0_stat = c / d  # стационарная численность хищников
+y0_stat = a / b  # стационарная численность жертв
+
+println("Стационарное состояние системы:")
+println("x0 = $(round(x0_stat, digits=2)) (численность хищников)")
+println("y0 = $(round(y0_stat, digits=2)) (численность жертв)")
+```
+
+Начальные условия в стационарной точке
+
+```{julia}
+u0 = [x0_stat; y0_stat]
+```
+
+Временной интервал
+
+```{julia}
+tspan = (0.0, 100.0)
+```
+
+Определяем функцию, описывающую систему
+
+```{julia}
+function predator_prey!(du, u, p, t)
+    x, y = u
+    du[1] = -a*x + b*x*y  # хищники
+    du[2] = c*y - d*x*y    # жертвы
+end
+```
+
+Решаем систему ОДУ
+
+```{julia}
+prob = ODEProblem(predator_prey!, u0, tspan)
+sol = solve(prob, Tsit5(), saveat=0.1)
+```
+
+Извлекаем результаты
+
+```{julia}
+t = sol.t
+x = [u[1] for u in sol.u]
+y = [u[2] for u in sol.u]
+```
+
+# График 1: Стационарное состояние во времени
+Динамика численности видов в стационарной точке
+
+```{julia}
+p1 = plot(t, [x y],
+    linewidth=2,
+    label=["Хищники" "Жертвы"],
+    xlabel="Время t",
+    ylabel="Численность",
+    title="Стационарное состояние системы",
+    color=[:red :green],
+    grid=true
+)
+savefig(p1, joinpath(plots_dir, "stationary_time.png"))
+```
+
+# График 2: Стационарная точка на фазовой плоскости
+Фазовый портрет в стационарном состоянии (точка)
+
+```{julia}
+p2 = scatter(x, y,
+    markersize=8,
+    color=:blue,
+    markerstrokecolor=:blue,
+    xlabel="Численность хищников (x)",
+    ylabel="Численность жертв (y)",
+    title="Стационарная точка на фазовой плоскости",
+    label="Стационарная точка",
+    grid=true
+)
+savefig(p2, joinpath(plots_dir, "stationary_point.png"))
+
+println("\nГрафики сохранены в директорию: $plots_dir")
+println("Файлы:")
+println("  - stationary_time.png")
+println("  - stationary_point.png")
+```
+

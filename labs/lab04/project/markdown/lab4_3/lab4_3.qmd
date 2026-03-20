@@ -1,0 +1,91 @@
+# Случай 3: Колебания с затуханием и внешней силой
+Уравнение: $\ddot{x} + 15\dot{x} + 5x = 0.8\cos(12t)$
+
+```{julia}
+using DrWatson
+@quickactivate "project"
+using DifferentialEquations
+using Plots
+```
+
+## Создание директории для сохранения графиков
+
+```{julia}
+plot_dir = plotsdir("lab4")
+mkpath(plot_dir)
+```
+
+## Параметры системы
+Собственная частота: $\omega_0 = \sqrt{5}$
+Коэффициент затухания: $\gamma = 15$
+
+```{julia}
+const ω = √(5.0)
+const γ = 15.0
+```
+
+## Функция внешней силы
+Гармоническая внешняя сила: $f(t) = 0.8\cos(12t)$
+
+```{julia}
+f(t) = 0.8 * cos(12 * t)
+```
+
+## Правая часть системы дифференциальных уравнений
+Система в форме Коши с затуханием и внешней силой:
+\[
+\begin{cases}
+\dot{x} = y \\
+\dot{y} = -\omega_0^2 x - \gamma y + 0.8\cos(12t)
+\end{cases}
+\]
+
+```{julia}
+function oscillator!(du, u, p, t)
+    du[1] = u[2]
+    du[2] = -ω^2 * u[1] - γ * u[2] + f(t)
+end
+```
+
+## Начальные условия
+$x_0 = 0$, $\dot{x}_0 = -0.6$
+
+```{julia}
+u0 = [0.0, -0.6]
+tspan = (0.0, 77.0)
+```
+
+## Решение системы ОДУ
+
+```{julia}
+prob = ODEProblem(oscillator!, u0, tspan)
+sol = solve(prob, Tsit5(), saveat = 0.05)
+```
+
+## Построение графиков
+### График решения $x(t)$
+
+```{julia}
+plot(sol, idxs = 1,
+     xlabel = "Время t",
+     ylabel = "Смещение x",
+     title = "Случай 3: x(t) с затуханием и внешней силой",
+     legend = false,
+     linewidth = 2)
+savefig(joinpath(plot_dir, "lab4_julia_3.png"))
+```
+
+### Фазовый портрет $(x, \dot{x})$
+
+```{julia}
+plot(sol, idxs = (1, 2),
+     xlabel = "x",
+     ylabel = "dx/dt",
+     title = "Фазовый портрет с внешней силой (случай 3)",
+     legend = false,
+     linewidth = 1)
+savefig(joinpath(plot_dir, "lab4_julia_3_phase.png"))
+
+println("Случай 3 выполнен. Графики сохранены в папку plots/lab4/")
+```
+
