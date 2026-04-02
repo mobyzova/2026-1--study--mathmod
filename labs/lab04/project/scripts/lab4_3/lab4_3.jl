@@ -6,18 +6,18 @@ using Plots
 plot_dir = plotsdir("lab4")
 mkpath(plot_dir)
 
-const ω = √(5.0)
-const γ = 15.0
+const ω = √(6.6)
+const γ = 7.0
 
-f(t) = 0.8 * cos(12 * t)
+f(t) = 0.3 * sin(12 * t)
 
 function oscillator!(du, u, p, t)
     du[1] = u[2]
     du[2] = -ω^2 * u[1] - γ * u[2] + f(t)
 end
 
-u0 = [0.0, -0.6]
-tspan = (0.0, 77.0)
+u0 = [1.5, 0.0]
+tspan = (0.0, 73.0)
 
 prob = ODEProblem(oscillator!, u0, tspan)
 sol = solve(prob, Tsit5(), saveat = 0.05)
