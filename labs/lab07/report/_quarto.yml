@@ -6,9 +6,9 @@ standalone: true
 self-contained: true
 
 ## Julia support
-# engine: julia
-# julia:
-#   exeflags: ["--project=../project"]
+engine: julia
+julia:
+    exeflags: ["--project=../project"]
 
 ## Generic options
 lang: ru-RU
@@ -34,7 +34,7 @@ format:
     toc-depth: 2
   ### Pdf output format
   pdf:
-    # pdf-engine: xelatex
+    # pdf-engine: pdflatex
     ### minted support
     # filters:
     #   - minted-quarto
@@ -52,15 +52,9 @@ format:
     #### Language
     babel-lang: russian
     babel-otherlangs: english
-    #### Biblatex
-    cite-method: biblatex
-    biblio-style: gost-numeric
-    biblatexoptions:
-      - backend=biber
-      - langhook=extras
-      - autolang=other*
     #### Misc options
     csquotes: true
     indent: true
     include-in-header:
       - file: _resources/tex/preamble.tex
+    # Biblatex settings removed to avoid installation issues
